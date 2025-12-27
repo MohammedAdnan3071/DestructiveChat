@@ -1,8 +1,11 @@
 'use client'
 
+import { useMutation } from "@tanstack/react-query";
 import { timeStamp } from "console";
 import { nanoid } from "nanoid";
 import { useEffect, useState } from "react";
+import { client }from "../lib/client"
+import { useRouter } from "next/navigation";
 
 const NAMES =["Mike Wheeler" ,"Dustin Henderson" ,"Lucas Sinclair" ,"Will Byers" ,"Eleven" ,"Steve Harrington","Nancy", "Jonathon Byers" ,"Jim Hopper","Murray Bauman", "Walter White" ,"Jesse Pinkman" ,"Skyler White","Hank Schrader" ,"Marie Schrader" ,"Tuco Salamanca" ,"Gus Fring" ,"Billy Butcher" ,"Hugie Campbell" ,"MM","Frenchie" ,"Kimiko" ,"Homelander" ,"Maeve" ,"Starlight","A-Train","The Deep" ,"Black Noir" ,"Translucent" ,"Soldier Boy"]
 
@@ -17,6 +20,8 @@ const generateUsername = () =>{
 export default function Home() {
  
   const [username, setUsername] = useState(" ");
+
+  const router = useRouter()
 
    useEffect(()=>{
     const main =( ) =>{
@@ -34,6 +39,16 @@ export default function Home() {
     main()
    },[])
 
+   const { mutate:createRoom  } = useMutation({
+     mutationFn:async () =>{
+        const res = await client.room.create.post()
+        if(res.status === 200 ){
+          router.push(`/room/${res.data?.roomId}`)
+     }
+     }
+     
+   })
+
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4">
@@ -50,7 +65,7 @@ export default function Home() {
                 <div className="flex-1 bg-zinc-950 border border-zinc-800 p-3 text-sm text-zinc-400 font-mono">{username}</div>
               </div>
             </div>
-          <button className="w-full bg-zinc-100 text-black p-3 text-sm font-bold hover:bg-zinc-50 hover:text-black transition-colors mt-2 cursor-pointer disabled:opacity-50"> Create Secure Room </button>
+          <button onClick={() => createRoom()} className="w-full bg-zinc-100 text-black p-3 text-sm font-bold hover:bg-zinc-50 hover:text-black transition-colors mt-2 cursor-pointer disabled:opacity-50"> Create Secure Room </button>
           </div>
           
           </div>
@@ -58,6 +73,5 @@ export default function Home() {
     </main>
   );
 }
-
 
 
